@@ -1,0 +1,9 @@
+{
+	"name": "adf-abc8",
+	"location": "francecentral",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "504ee402-932e-4c13-951e-b0b859a6247f",
+		"tenantId": "1f320c02-d3de-4585-badb-adff5765c877"
+	}
+}

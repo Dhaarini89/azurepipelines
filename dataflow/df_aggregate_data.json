@@ -1,0 +1,120 @@
+{
+	"name": "df_aggregate_data",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "sqldb_payroll",
+						"type": "DatasetReference"
+					},
+					"name": "sqldbnycpayroll"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_historypayroll",
+						"type": "DatasetReference"
+					},
+					"name": "historydatalake"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_synapsepayroll",
+						"type": "DatasetReference"
+					},
+					"name": "synapsepayroll"
+				}
+			],
+			"transformations": [
+				{
+					"name": "uniondbhistory"
+				},
+				{
+					"name": "filterfiscayear"
+				},
+				{
+					"name": "derivetotalpaid"
+				},
+				{
+					"name": "aggregatetotalpaid"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     fiscalyear as integer (2021)",
+				"}",
+				"source(output(",
+				"          FiscalYear as integer,",
+				"          PayrollNumber as integer,",
+				"          AgencyID as string,",
+				"          AgencyName as string,",
+				"          EmployeeID as string,",
+				"          LastName as string,",
+				"          FirstName as string,",
+				"          AgencyStartDate as date,",
+				"          WorkLocationBorough as string,",
+				"          TitleCode as string,",
+				"          TitleDescription as string,",
+				"          LeaveStatusasofJune30 as string,",
+				"          BaseSalary as double,",
+				"          PayBasis as string,",
+				"          RegularHours as double,",
+				"          RegularGrossPaid as double,",
+				"          OTHours as double,",
+				"          TotalOTPaid as double,",
+				"          TotalOtherPay as double",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> sqldbnycpayroll",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> historydatalake",
+				"sqldbnycpayroll, historydatalake union(byName: true)~> uniondbhistory",
+				"uniondbhistory filter(toInteger(FiscalYear) >= $fiscalyear) ~> filterfiscayear",
+				"filterfiscayear derive(totalpaid = RegularGrossPaid + TotalOTPaid + TotalOtherPay) ~> derivetotalpaid",
+				"derivetotalpaid aggregate(groupBy(AgencyName,",
+				"          FiscalYear),",
+				"     totalpaid = sum(totalpaid)) ~> aggregatetotalpaid",
+				"aggregatetotalpaid sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          FiscalYear as integer,",
+				"          PayrollNumber as integer,",
+				"          AgencyID as string,",
+				"          AgencyName as string,",
+				"          EmployeeID as string,",
+				"          LastName as string,",
+				"          FirstName as string,",
+				"          AgencyStartDate as date,",
+				"          WorkLocationBorough as string,",
+				"          TitleCode as string,",
+				"          TitleDescription as string,",
+				"          LeaveStatusasofJune30 as string,",
+				"          BaseSalary as double,",
+				"          PayBasis as string,",
+				"          RegularHours as double,",
+				"          RegularGrossPaid as double,",
+				"          OTHours as double,",
+				"          TotalOTPaid as double,",
+				"          TotalOtherPay as double",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     truncate:true,",
+				"     format: 'table',",
+				"     staged: true,",
+				"     allowCopyCommand: true,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> synapsepayroll"
+			]
+		}
+	}
+}
