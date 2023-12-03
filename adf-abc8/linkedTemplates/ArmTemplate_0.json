@@ -766,6 +766,9 @@
 						},
 						{
 							"name": "aggregatetotalpaid"
+						},
+						{
+							"name": "modifycolumn"
 						}
 					],
 					"scriptLines": [
@@ -800,12 +803,26 @@
 						"source(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     ignoreNoFilesFound: false) ~> historydatalake",
-						"sqldbnycpayroll, historydatalake union(byName: true)~> uniondbhistory",
+						"modifycolumn, historydatalake union(byName: true)~> uniondbhistory",
 						"uniondbhistory filter(toInteger(FiscalYear) >= $fiscalyear) ~> filterfiscayear",
 						"filterfiscayear derive(totalpaid = RegularGrossPaid + TotalOTPaid + TotalOtherPay) ~> derivetotalpaid",
 						"derivetotalpaid aggregate(groupBy(AgencyName,",
 						"          FiscalYear),",
-						"     totalpaid = sum(totalpaid)) ~> aggregatetotalpaid",
+						"     totalpaid = sum(toFloat(totalpaid))) ~> aggregatetotalpaid",
+						"sqldbnycpayroll cast(output(",
+						"          FiscalYear as string,",
+						"          PayrollNumber as string,",
+						"          AgencyID as string,",
+						"          EmployeeID as string,",
+						"          AgencyStartDate as string,",
+						"          BaseSalary as string,",
+						"          RegularHours as string,",
+						"          RegularGrossPaid as string,",
+						"          OTHours as string,",
+						"          TotalOTPaid as string,",
+						"          TotalOtherPay as string",
+						"     ),",
+						"     errors: true) ~> modifycolumn",
 						"aggregatetotalpaid sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     input(",
