@@ -82,7 +82,7 @@
 				"filterfiscayear derive(totalpaid = RegularGrossPaid + TotalOTPaid + TotalOtherPay) ~> derivetotalpaid",
 				"derivetotalpaid aggregate(groupBy(AgencyName,",
 				"          FiscalYear),",
-				"     totalpaid = sum(totalpaid)) ~> aggregatetotalpaid",
+				"     totalpaid = sum(toFloat(totalpaid))) ~> aggregatetotalpaid",
 				"sqldbnycpayroll cast(output(",
 				"          FiscalYear as string,",
 				"          PayrollNumber as string,",
