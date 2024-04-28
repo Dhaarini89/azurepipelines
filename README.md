@@ -2,7 +2,7 @@ The project is  to develop a Data Analytics platform on Azure Synapse Analytics 
  Analyze how the City's financial resources are allocated and how much of the City's budget is being devoted to overtime.
  Make the data available to the interested public to show how the City’s budget is being spent on salary and overtime pay for all municipal employees.
 
-In this prject,I was able to work with multiple Azure resources:
+In this project,I was able to work with multiple Azure resources:
 Azure Data Lake Gen2
 Azure SQL DB
 Azure Data Factory
