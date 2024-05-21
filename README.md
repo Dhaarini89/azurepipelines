@@ -20,4 +20,3 @@ The following flow diagram provides the High level Pipeline Overview of this pro
 - Ingestion: Azure Data Lake Gen2
 - Storage: Azure Synapse Analytics
 
-By the end of this project,I had the experience in working with multiple Azure resources in order to create dataflows,pipelines and make use of triggers.
